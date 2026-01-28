@@ -4,6 +4,6 @@ late Client client;
 
 void initServerpodClient() {
   client = Client(
-    'http://10.0.2.2:8080/',
+    'http://192.168.0.102:8080/'
   );
 }

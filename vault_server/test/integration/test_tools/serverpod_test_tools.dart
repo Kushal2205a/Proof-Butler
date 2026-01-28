@@ -524,6 +524,41 @@ class _EvidenceEndpoint {
       }
     });
   }
+
+  _i3.Future<bool> verifyEvidence(
+    _i1.TestSessionBuilder sessionBuilder,
+    int evidenceId,
+    String hashin,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'evidence',
+            method: 'verifyEvidence',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'evidence',
+          methodName: 'verifyEvidence',
+          parameters: _i1.testObjectToJson({
+            'evidenceId': evidenceId,
+            'hashin': hashin,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<bool>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
 }
 
 class _GreetingEndpoint {

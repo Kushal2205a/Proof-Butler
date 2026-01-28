@@ -259,6 +259,18 @@ class EndpointEvidence extends _i2.EndpointRef {
         'listEvidenceRecords',
         {},
       );
+
+  _i3.Future<bool> verifyEvidence(
+    int evidenceId,
+    String hashin,
+  ) => caller.callServerEndpoint<bool>(
+    'evidence',
+    'verifyEvidence',
+    {
+      'evidenceId': evidenceId,
+      'hashin': hashin,
+    },
+  );
 }
 
 /// This is an example endpoint that returns a greeting message through

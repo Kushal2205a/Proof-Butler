@@ -141,14 +141,17 @@ class _EvidenceListScreenState extends State<EvidenceListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(title: const Text("Evidence List")),
-        body: ListView(
-          children: const [
-            ListTile(title : Text('Placeholder rec 1') , subtitle: Text("hash : ..."),),
-            ListTile(title : Text('Placeholder rec 2') , subtitle: Text("hash : ..."),)
+        body: _loading
+            ? const Center(child: CircularProgressIndicator())
+            : (_error != null) ? Center( child: Padding(padding: const EdgeInsets.all(16), child: Column(mainAxisSize: MainAxisSize.min, children: [Text('Error: ${_error}'), const SizedBox(height: 12,), ElevatedButton(onPressed: _load, child: const Text('Retry'))],),),)
+            : RefreshIndicator(child: ListView.builder(itemCount: _records.length, itemBuilder: (context,i) {final r  = _records[i];
+            return ListTile(
+              title: Text("Evidence ID : ${r.id ?? "-"}"),
+              subtitle: Text("Hash : ${r.hash}\nCreated At : ${r.createdAt}"),
+              isThreeLine: true,
+            );
+            }), onRefresh: _load)
 
-
-          ],
-        )
 
     );
   }
@@ -168,6 +171,7 @@ class _VerifyEvidenceScreenState extends State<VerifyEvidenceScreen>{
   bool _picking = false ;
   String? _sha256;
   bool _hashing = false;
+
 
   Future<void> _pickImage() async{
     setState(() => _picking = true);

@@ -13,5 +13,11 @@ class EvidenceEndpoint extends Endpoint{
 
   }
 
+  Future<bool> verifyEvidence(Session session, int evidenceId, String hashin) async{
+    final rec = await EvidenceRecord.db.findById(session, evidenceId);
+    if (rec == null) return false ;
+    return rec.hash == hashin ;
+  }
+
 
 }

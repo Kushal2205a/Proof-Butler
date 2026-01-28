@@ -282,6 +282,31 @@ class Endpoints extends _i1.EndpointDispatch {
               ) async => (endpoints['evidence'] as _i4.EvidenceEndpoint)
                   .listEvidenceRecords(session),
         ),
+        'verifyEvidence': _i1.MethodConnector(
+          name: 'verifyEvidence',
+          params: {
+            'evidenceId': _i1.ParameterDescription(
+              name: 'evidenceId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'hashin': _i1.ParameterDescription(
+              name: 'hashin',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['evidence'] as _i4.EvidenceEndpoint)
+                  .verifyEvidence(
+                    session,
+                    params['evidenceId'],
+                    params['hashin'],
+                  ),
+        ),
       },
     );
     connectors['greeting'] = _i1.EndpointConnector(
