@@ -172,7 +172,83 @@ class _VerifyEvidenceScreenState extends State<VerifyEvidenceScreen>{
   String? _sha256;
   bool _hashing = false;
 
+  List<EvidenceRecord> _records = [] ;
+  bool _loading = true ;
 
+  EvidenceRecord? _selected ;
+
+  bool _loadingRecords = true ;
+  String? _recordsError;
+
+  bool _verifying = false ;
+  bool? _match;
+  String? _storedHash;
+  String? _verifyError ;
+
+  @override
+  void initState(){
+    super.initState();
+    _loadRecords();
+  }
+
+  Future<void> _verify() async{
+    if(_selected?.id == null) return ;
+    if(_sha256 == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Pick an image to verify")),
+      );
+      return ;
+    }
+
+    setState(() {
+      _verifying = true ;
+      _match = null ;
+      _storedHash = null;
+      _verifyError = null ;
+    });
+
+    try {
+      final resu = await client.evidence.verifyEvidence(_selected!.id!, _sha256!);
+      setState(() {
+        _match = resu;
+
+      });
+    }catch(e) {
+      setState(() {
+        _verifyError = e.toString();
+      });
+    } finally{
+      if (mounted){
+        setState(() {
+          _verifying = false;
+        });
+      }
+    }
+
+
+  }
+
+  Future<void> _loadRecords() async{
+    setState(() {
+      _loadingRecords = true ;
+      _recordsError = null ;
+    });
+
+    try{
+      final rows =  await client.evidence.listEvidenceRecords();
+      if (!mounted) return ;
+      setState(() {
+        _records = rows;
+        _selected = rows.isNotEmpty ? rows.first : null ;
+      });
+    }catch(e){
+      if (!mounted) return ;
+      setState(() {
+        _recordsError = e.toString();
+      });
+    }finally{
+      if(mounted) _loadingRecords = false ;
+    }
+  }
   Future<void> _pickImage() async{
     setState(() => _picking = true);
 
@@ -238,7 +314,31 @@ class _VerifyEvidenceScreenState extends State<VerifyEvidenceScreen>{
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            const Align(alignment: Alignment.centerLeft, child: Text('Pick record : (placeholder)')),
+            if(_loadingRecords)
+              const Align(alignment: Alignment.centerLeft, child: Text('Loading Records....'),)
+            else if (_recordsError != null)
+              Align(alignment: Alignment.centerLeft,child: Text("Error load record ${_recordsError} "),)
+            else if (_records.isEmpty)
+              Align(alignment: Alignment.centerLeft, child: Text("No records available, create one"),)
+            else
+              DropdownButton<EvidenceRecord>(
+                isExpanded: true,
+                value: _selected,
+                items : _records.map((r){
+                  return DropdownMenuItem<EvidenceRecord>(
+                    value: r,
+                    child: Text('ID ${r.id ?? "-"}'),
+                  );
+                }).toList(),
+                onChanged: (v){
+                  setState(() {
+                    _selected = v ;
+                    _match = null ;
+                    _storedHash = null ;
+                    _verifyError = null ;
+                  });
+                },
+              ),
             const SizedBox(height: 8,),
             Align(
               alignment: Alignment.centerLeft,
@@ -263,8 +363,21 @@ class _VerifyEvidenceScreenState extends State<VerifyEvidenceScreen>{
             Align(alignment: Alignment.centerLeft, child: Text(_hashing? 'SHA-256: hashing' : 'SHA-256: ${_sha256 ?? "-"}'),),
 
             const SizedBox(height: 16),
-            const SizedBox(width: double.infinity, child: ElevatedButton(onPressed: null, child: Text('Verify (placeholder)'))),
-            const Align(alignment: Alignment.centerLeft, child: Text("Result: (placeholder)"),)
+            SizedBox(width: double.infinity, child: ElevatedButton(onPressed: _verifying ? null : _verify, child: Text(_verifying ? 'Verifying' : 'Verify' ))),
+            const SizedBox(height: 12,),
+            Align(alignment: Alignment.centerLeft, child: Text(
+              _verifyError != null
+                  ? 'Error: $_verifyError'
+                  : (_match == null)
+                  ? 'Result: -'
+                  : (_match! ? 'Result: MATCH' : 'Result: MISMATCH'),
+                 ),),
+
+            if (_storedHash != null)
+              Align(alignment: Alignment.centerLeft,
+              child: Text('Stored Hash : ${_storedHash}'),),
+
+            Align(alignment: Alignment.centerLeft, child: Text('Computed Hash : ${_sha256 ?? "-"}'),)
 
           ],
         ),
@@ -272,6 +385,8 @@ class _VerifyEvidenceScreenState extends State<VerifyEvidenceScreen>{
 
     );
   }
+
+
 
 }
 class CreateEvidenceScreen extends StatefulWidget {
