@@ -4,3 +4,4 @@ fields :
   hash : String
   note : String?
   createdAt : DateTime
+  thumbnail: ByteData?

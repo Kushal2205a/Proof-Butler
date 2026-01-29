@@ -11,6 +11,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
+import 'dart:typed_data' as _i2;
 
 abstract class EvidenceRecord implements _i1.SerializableModel {
   EvidenceRecord._({
@@ -18,6 +19,7 @@ abstract class EvidenceRecord implements _i1.SerializableModel {
     required this.hash,
     this.note,
     required this.createdAt,
+    this.thumbnail,
   });
 
   factory EvidenceRecord({
@@ -25,6 +27,7 @@ abstract class EvidenceRecord implements _i1.SerializableModel {
     required String hash,
     String? note,
     required DateTime createdAt,
+    _i2.ByteData? thumbnail,
   }) = _EvidenceRecordImpl;
 
   factory EvidenceRecord.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -35,6 +38,9 @@ abstract class EvidenceRecord implements _i1.SerializableModel {
       createdAt: _i1.DateTimeJsonExtension.fromJson(
         jsonSerialization['createdAt'],
       ),
+      thumbnail: jsonSerialization['thumbnail'] == null
+          ? null
+          : _i1.ByteDataJsonExtension.fromJson(jsonSerialization['thumbnail']),
     );
   }
 
@@ -49,6 +55,8 @@ abstract class EvidenceRecord implements _i1.SerializableModel {
 
   DateTime createdAt;
 
+  _i2.ByteData? thumbnail;
+
   /// Returns a shallow copy of this [EvidenceRecord]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
@@ -57,6 +65,7 @@ abstract class EvidenceRecord implements _i1.SerializableModel {
     String? hash,
     String? note,
     DateTime? createdAt,
+    _i2.ByteData? thumbnail,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -66,6 +75,7 @@ abstract class EvidenceRecord implements _i1.SerializableModel {
       'hash': hash,
       if (note != null) 'note': note,
       'createdAt': createdAt.toJson(),
+      if (thumbnail != null) 'thumbnail': thumbnail?.toJson(),
     };
   }
 
@@ -83,11 +93,13 @@ class _EvidenceRecordImpl extends EvidenceRecord {
     required String hash,
     String? note,
     required DateTime createdAt,
+    _i2.ByteData? thumbnail,
   }) : super._(
          id: id,
          hash: hash,
          note: note,
          createdAt: createdAt,
+         thumbnail: thumbnail,
        );
 
   /// Returns a shallow copy of this [EvidenceRecord]
@@ -99,12 +111,16 @@ class _EvidenceRecordImpl extends EvidenceRecord {
     String? hash,
     Object? note = _Undefined,
     DateTime? createdAt,
+    Object? thumbnail = _Undefined,
   }) {
     return EvidenceRecord(
       id: id is int? ? id : this.id,
       hash: hash ?? this.hash,
       note: note is String? ? note : this.note,
       createdAt: createdAt ?? this.createdAt,
+      thumbnail: thumbnail is _i2.ByteData?
+          ? thumbnail
+          : this.thumbnail?.clone(),
     );
   }
 }

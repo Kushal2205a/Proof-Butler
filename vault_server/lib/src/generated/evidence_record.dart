@@ -11,6 +11,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
+import 'dart:typed_data' as _i2;
 
 abstract class EvidenceRecord
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -19,6 +20,7 @@ abstract class EvidenceRecord
     required this.hash,
     this.note,
     required this.createdAt,
+    this.thumbnail,
   });
 
   factory EvidenceRecord({
@@ -26,6 +28,7 @@ abstract class EvidenceRecord
     required String hash,
     String? note,
     required DateTime createdAt,
+    _i2.ByteData? thumbnail,
   }) = _EvidenceRecordImpl;
 
   factory EvidenceRecord.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -36,6 +39,9 @@ abstract class EvidenceRecord
       createdAt: _i1.DateTimeJsonExtension.fromJson(
         jsonSerialization['createdAt'],
       ),
+      thumbnail: jsonSerialization['thumbnail'] == null
+          ? null
+          : _i1.ByteDataJsonExtension.fromJson(jsonSerialization['thumbnail']),
     );
   }
 
@@ -52,6 +58,8 @@ abstract class EvidenceRecord
 
   DateTime createdAt;
 
+  _i2.ByteData? thumbnail;
+
   @override
   _i1.Table<int?> get table => t;
 
@@ -63,6 +71,7 @@ abstract class EvidenceRecord
     String? hash,
     String? note,
     DateTime? createdAt,
+    _i2.ByteData? thumbnail,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -72,6 +81,7 @@ abstract class EvidenceRecord
       'hash': hash,
       if (note != null) 'note': note,
       'createdAt': createdAt.toJson(),
+      if (thumbnail != null) 'thumbnail': thumbnail?.toJson(),
     };
   }
 
@@ -83,6 +93,7 @@ abstract class EvidenceRecord
       'hash': hash,
       if (note != null) 'note': note,
       'createdAt': createdAt.toJson(),
+      if (thumbnail != null) 'thumbnail': thumbnail?.toJson(),
     };
   }
 
@@ -124,11 +135,13 @@ class _EvidenceRecordImpl extends EvidenceRecord {
     required String hash,
     String? note,
     required DateTime createdAt,
+    _i2.ByteData? thumbnail,
   }) : super._(
          id: id,
          hash: hash,
          note: note,
          createdAt: createdAt,
+         thumbnail: thumbnail,
        );
 
   /// Returns a shallow copy of this [EvidenceRecord]
@@ -140,12 +153,16 @@ class _EvidenceRecordImpl extends EvidenceRecord {
     String? hash,
     Object? note = _Undefined,
     DateTime? createdAt,
+    Object? thumbnail = _Undefined,
   }) {
     return EvidenceRecord(
       id: id is int? ? id : this.id,
       hash: hash ?? this.hash,
       note: note is String? ? note : this.note,
       createdAt: createdAt ?? this.createdAt,
+      thumbnail: thumbnail is _i2.ByteData?
+          ? thumbnail
+          : this.thumbnail?.clone(),
     );
   }
 }
@@ -168,6 +185,12 @@ class EvidenceRecordUpdateTable extends _i1.UpdateTable<EvidenceRecordTable> {
         table.createdAt,
         value,
       );
+
+  _i1.ColumnValue<_i2.ByteData, _i2.ByteData> thumbnail(_i2.ByteData? value) =>
+      _i1.ColumnValue(
+        table.thumbnail,
+        value,
+      );
 }
 
 class EvidenceRecordTable extends _i1.Table<int?> {
@@ -186,6 +209,10 @@ class EvidenceRecordTable extends _i1.Table<int?> {
       'createdAt',
       this,
     );
+    thumbnail = _i1.ColumnByteData(
+      'thumbnail',
+      this,
+    );
   }
 
   late final EvidenceRecordUpdateTable updateTable;
@@ -196,12 +223,15 @@ class EvidenceRecordTable extends _i1.Table<int?> {
 
   late final _i1.ColumnDateTime createdAt;
 
+  late final _i1.ColumnByteData thumbnail;
+
   @override
   List<_i1.Column> get columns => [
     id,
     hash,
     note,
     createdAt,
+    thumbnail,
   ];
 }
 
