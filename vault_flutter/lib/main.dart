@@ -5,6 +5,8 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:vault_client/vault_client.dart';
+import 'package:flutter/services.dart';
+
 
 
 void main() {
@@ -75,14 +77,15 @@ class HomeScreen extends StatelessWidget{
               ),
 
               const SizedBox(height : 12),
-
-              TextButton(
-                onPressed: () {
-                                    Navigator.push(context, MaterialPageRoute(builder: (_) => const EvidenceListScreen()));
-                },
-                child: const Text("Evidence List(placeholder)")
-              ,)
-
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(icon: const Icon(Icons.list),
+                    onPressed: ()  {
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => const EvidenceListScreen()));
+                    },
+                    label: const  Text("Evidence List")
+                ),
+              ),
 
 
             ],
@@ -152,7 +155,18 @@ class _EvidenceListScreenState extends State<EvidenceListScreen> {
             return ListTile(
               title: Text(title, style: Theme.of(context).textTheme.titleMedium,),
               subtitle: Text("ID: ${r.id ?? "-"}\nCreated At : ${r.createdAt}"),
-              trailing: Text(shortHash),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(shortHash),
+                  IconButton(tooltip: 'Copy' , onPressed: (){
+                    final text = 'Evidence ID : ${r.id ?? "-"}\nTitle: $title\nHash ${r.hash}\nCreated At: ${r.createdAt}';
+                    Clipboard.setData(ClipboardData(text: text));
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Copied Evidence Details")));
+                  }, icon: const Icon(Icons.copy))
+                ],
+              ),
+
               isThreeLine: true,
             );
             }), onRefresh: _load)
@@ -375,7 +389,7 @@ class _VerifyEvidenceScreenState extends State<VerifyEvidenceScreen>{
                   ? 'Error: $_verifyError'
                   : (_match == null)
                   ? 'Result: -'
-                  : (_match! ? 'Result: MATCH' : 'Result: MISMATCH'),
+                  : (_match! ? 'Result: MATCH' : 'Result: MISMATCH : The Image was tampered'),
                  ),),
 
             if (_storedHash != null)
@@ -555,6 +569,13 @@ class _CreateEvidenceScreenState  extends State<CreateEvidenceScreen>{
                   alignment: Alignment.centerLeft,
                   child: Text('Evidence ID : ${_savedId}'),
                 ),
+              if(_savedId != null)
+                TextButton.icon(onPressed: () {
+                  final title = _noteCtrl.text.trim().isEmpty ? '(untitled)' : _noteCtrl.text.trim();
+                  final text = 'Evidence ID: $_savedId\nTitle: $title';
+                  Clipboard.setData(ClipboardData(text: text));
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Copied Evidence details')),);
+                }, icon: const Icon(Icons.copy), label: const Text('Copy Evidence ID'),),
               if (_saveError != null)
                 Align(
                   alignment: Alignment.centerLeft,
