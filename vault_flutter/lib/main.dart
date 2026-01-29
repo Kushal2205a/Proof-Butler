@@ -144,10 +144,15 @@ class _EvidenceListScreenState extends State<EvidenceListScreen> {
         body: _loading
             ? const Center(child: CircularProgressIndicator())
             : (_error != null) ? Center( child: Padding(padding: const EdgeInsets.all(16), child: Column(mainAxisSize: MainAxisSize.min, children: [Text('Error: ${_error}'), const SizedBox(height: 12,), ElevatedButton(onPressed: _load, child: const Text('Retry'))],),),)
-            : RefreshIndicator(child: ListView.builder(itemCount: _records.length, itemBuilder: (context,i) {final r  = _records[i];
+            : RefreshIndicator(child: ListView.builder(itemCount: _records.length, itemBuilder: (context,i) {
+              final r  = _records[i];
+              final title = (r.note != null && r.note!.trim().isNotEmpty) ? r.note!.trim() : '(untitled)';
+              final shortHash = r.hash.length > 8 ? r.hash.substring(0,8) : r.hash;
+
             return ListTile(
-              title: Text("Evidence ID : ${r.id ?? "-"}"),
-              subtitle: Text("Hash : ${r.hash}\nCreated At : ${r.createdAt}"),
+              title: Text(title, style: Theme.of(context).textTheme.titleMedium,),
+              subtitle: Text("ID: ${r.id ?? "-"}\nCreated At : ${r.createdAt}"),
+              trailing: Text(shortHash),
               isThreeLine: true,
             );
             }), onRefresh: _load)
@@ -480,6 +485,16 @@ class _CreateEvidenceScreenState  extends State<CreateEvidenceScreen>{
       return;
     }
 
+    final title = _noteCtrl.text.trim();
+    if(title.isEmpty){
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Title is required"))
+
+      );
+      return ;
+
+    }
+
     setState(() {
       _saving = true ;
       _savedId = null ;
@@ -488,7 +503,7 @@ class _CreateEvidenceScreenState  extends State<CreateEvidenceScreen>{
     });
 
     try {
-      final saved =   await client.evidence.createEvidenceRecord(_sha256!, _noteCtrl.text.trim().isEmpty ? null : _noteCtrl.text.trim() );
+      final saved =   await client.evidence.createEvidenceRecord(_sha256!, title );
       setState(() => _savedId = saved.id);
 
     }catch(e){}finally{}
@@ -522,7 +537,7 @@ class _CreateEvidenceScreenState  extends State<CreateEvidenceScreen>{
 
               TextField(
                 controller: _noteCtrl,
-                decoration: const InputDecoration(labelText: "Note"),
+                decoration: const InputDecoration(labelText: "Title"),
               ),
 
               const Spacer(),
