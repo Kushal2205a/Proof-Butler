@@ -166,7 +166,7 @@ class _EvidenceListScreenState extends State<EvidenceListScreen> {
                   IconButton(tooltip: 'Copy' , onPressed: (){
                     final text = 'Proof ID: ${r.id ?? "-"}\nTitle: $title\nHash: ${r.hash}\nCreated At: ${r.createdAt}';
                     Clipboard.setData(ClipboardData(text: text));
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Copied Evidence Details")));
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Copied Proof Details")));
                   }, icon: const Icon(Icons.copy))
                 ],
               ),
@@ -622,12 +622,12 @@ class _CreateEvidenceScreenState  extends State<CreateEvidenceScreen>{
               if(_savedId != null)
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: Text('Evidence ID : ${_savedId}'),
+                  child: Text('Proof ID : ${_savedId}'),
                 ),
               if(_savedId != null)
                 TextButton.icon(onPressed: () {
                   final title = _noteCtrl.text.trim().isEmpty ? '(untitled)' : _noteCtrl.text.trim();
-                  final text = 'Evidence ID: $_savedId\nTitle: $title';
+                  final text = 'Proof ID: $_savedId\nTitle: $title';
                   Clipboard.setData(ClipboardData(text: text));
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Copied Proof details')),);
                 }, icon: const Icon(Icons.copy), label: const Text('Copy Proof ID'),),
